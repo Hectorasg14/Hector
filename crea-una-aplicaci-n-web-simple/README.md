@@ -19,3 +19,8 @@ Local: http://127.0.0.1:4174/
 7. Reinicia/redeploya el servicio.
 
 Los datos se guardan en `state.json` dentro del volumen en Railway. Localmente se guardan en `data/state.json`.
+
+
+## Si Railway falla al construir
+
+Este proyecto incluye un `Dockerfile`, asi que Railway puede construirlo sin adivinar el entorno. Sube tambien `Dockerfile`, `.dockerignore`, `package.json`, `server.js`, `railway.json`, `outputs/` y `data/`.
