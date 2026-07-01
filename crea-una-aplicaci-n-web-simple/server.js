@@ -71,6 +71,10 @@ const initialState = {
       "status": "Mantencion"
     }
   ],
+  "tractorTrailers": [
+    { "id": "tc1", "type": "Tractor", "plate": "TR-001", "model": "John Deere 5075E", "capacity": "75 HP", "status": "Disponible" },
+    { "id": "tc2", "type": "Coloso", "plate": "CO-014", "model": "Coloso agricola", "capacity": "8 ton", "status": "Arrendado" }
+  ],
   "drivers": [
     {
       "id": "d3",
