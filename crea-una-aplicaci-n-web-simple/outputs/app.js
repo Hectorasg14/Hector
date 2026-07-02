@@ -9,6 +9,10 @@ const state = {
     { id: "t2", plate: "LR-9087", model: "Mercedes Atego", capacity: "8 ton", status: "En ruta" },
     { id: "t3", plate: "PX-4412", model: "Scania P", capacity: "16 ton", status: "Mantencion" }
   ],
+  tractorTrailers: [
+    { id: "tc1", type: "Tractor", plate: "TR-001", model: "John Deere 5075E", capacity: "75 HP", status: "Disponible" },
+    { id: "tc2", type: "Coloso", plate: "CO-014", model: "Coloso agricola", capacity: "8 ton", status: "Disponible" }
+  ],
   drivers: [
     { id: "d1", name: "Carlos Vega", phone: "+56 9 5566 7788", license: "A5", status: "Disponible" },
     { id: "d2", name: "Marcela Soto", phone: "+56 9 2221 9090", license: "A4", status: "En ruta" },
@@ -95,7 +99,7 @@ function importState(file) {
   reader.readAsText(file);
 }
 
-const labels = { Disponible: "ready", Programado: "ready", "En ruta": "transit", Terminado: "ready", Pendiente: "pending", Mantencion: "maintenance", Descanso: "offline" };
+const labels = { Disponible: "ready", Programado: "ready", "En ruta": "transit", Terminado: "ready", Pendiente: "pending", Mantencion: "maintenance", Descanso: "offline", Arrendado: "rented" };
 const week = [["2026-06-29", "Lunes"], ["2026-06-30", "Martes"], ["2026-07-01", "Miercoles"], ["2026-07-02", "Jueves"], ["2026-07-03", "Viernes"], ["2026-07-04", "Sabado"], ["2026-07-05", "Domingo"]];
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -122,6 +126,7 @@ function renderDashboard() {
   $('#metricOrders').textContent = state.orders.length;
   $('#metricClients').textContent = state.clients.length;
   $('#metricTrucks').textContent = state.trucks.filter((truck) => truck.status !== 'Mantencion').length;
+  $('#metricTractorTrailers').textContent = state.tractorTrailers.filter((item) => item.status !== 'Mantencion').length;
   $('#metricDrivers').textContent = state.drivers.filter((driver) => driver.status === 'Disponible').length;
   $('#metricHelpers').textContent = state.helpers.filter((helper) => helper.status === 'Disponible').length;
   $('#metricSettlement').textContent = state.orders.filter((order) => ['Por rendir', 'Parcial'].includes(settlementStatus(order))).length;
@@ -131,14 +136,16 @@ function renderDashboard() {
 function renderOrders() { $('#ordersTable').innerHTML = state.orders.map((order) => { const truck = byId('trucks', order.truckId), driver = byId('drivers', order.driverId); return '<tr><td>' + order.code + '</td><td>' + stopsSummary(order) + '</td><td>' + order.origin + '</td><td>' + formatDate(order.date) + '</td><td>' + (truck?.plate || 'Sin camion') + '</td><td>' + (driver?.name || 'Sin conductor') + '</td><td>' + helpersSummary(order) + '</td><td>' + badge(order.status) + '</td><td>' + settlementSummary(order) + '</td><td><div class="actions"><button class="text-button" data-edit="orders" data-id="' + order.id + '">Editar</button><button class="text-button" data-delete="orders" data-id="' + order.id + '">Eliminar</button></div></td></tr>'; }).join(''); }
 function renderClients() { $('#clientsTable').innerHTML = state.clients.map((client) => '<tr><td>' + client.name + '</td><td>' + client.contact + '</td><td>' + client.phone + '</td><td>' + client.city + '</td><td><div class="actions"><button class="text-button" data-edit="clients" data-id="' + client.id + '">Editar</button><button class="text-button" data-delete="clients" data-id="' + client.id + '">Eliminar</button></div></td></tr>').join(''); }
 function renderTrucks() { $('#trucksTable').innerHTML = state.trucks.map((truck) => '<tr><td>' + truck.plate + '</td><td>' + truck.model + '</td><td>' + truck.capacity + '</td><td>' + badge(truck.status) + '</td><td><div class="actions"><button class="text-button" data-edit="trucks" data-id="' + truck.id + '">Editar</button><button class="text-button" data-delete="trucks" data-id="' + truck.id + '">Eliminar</button></div></td></tr>').join(''); }
+function renderTractorTrailers() { $('#tractorTrailersTable').innerHTML = state.tractorTrailers.map((item) => '<tr><td>' + item.type + '</td><td>' + item.plate + '</td><td>' + item.model + '</td><td>' + item.capacity + '</td><td>' + badge(item.status) + '</td><td><div class="actions"><button class="text-button" data-edit="tractorTrailers" data-id="' + item.id + '">Editar</button><button class="text-button" data-delete="tractorTrailers" data-id="' + item.id + '">Eliminar</button></div></td></tr>').join(''); }
 function renderDrivers() { $('#driversTable').innerHTML = state.drivers.map((driver) => '<tr><td>' + driver.name + '</td><td>' + driver.phone + '</td><td>' + driver.license + '</td><td>' + badge(driver.status) + '</td><td><div class="actions"><button class="text-button" data-edit="drivers" data-id="' + driver.id + '">Editar</button><button class="text-button" data-delete="drivers" data-id="' + driver.id + '">Eliminar</button></div></td></tr>').join(''); }
 function renderHelpers() { $('#helpersTable').innerHTML = state.helpers.map((helper) => '<tr><td>' + helper.name + '</td><td>' + helper.phone + '</td><td>' + badge(helper.status) + '</td><td><div class="actions"><button class="text-button" data-edit="helpers" data-id="' + helper.id + '">Editar</button><button class="text-button" data-delete="helpers" data-id="' + helper.id + '">Eliminar</button></div></td></tr>').join(''); }
 function renderCalendar() { $('#weeklyCalendar').innerHTML = week.map(([date, day]) => { const orders = state.orders.filter((order) => order.date === date); const cards = orders.length ? orders.map((order) => { const driver = byId('drivers', order.driverId); return '<article class="calendar-card"><strong>' + order.code + '</strong><span>Origen: ' + order.origin + '</span><span>' + orderStops(order).length + ' cliente(s): ' + orderDestinations(order) + '</span><span>' + (driver?.name || 'Sin conductor') + '</span><span>' + settlementStatus(order) + '</span></article>'; }).join('') : '<article class="calendar-card"><strong>Sin pedidos</strong><span>Disponible</span></article>'; return '<section class="day"><h3>' + day + ' - ' + shortDate(date) + '</h3>' + cards + '</section>'; }).join(''); }
-function renderAll() { renderDashboard(); renderOrders(); renderClients(); renderTrucks(); renderDrivers(); renderHelpers(); renderCalendar(); }
+function renderAll() { renderDashboard(); renderOrders(); renderClients(); renderTrucks(); renderTractorTrailers(); renderDrivers(); renderHelpers(); renderCalendar(); }
 
 const schemas = {
   clients: { title: 'Cliente', prefix: 'c', fields: [['name', 'Nombre', 'text'], ['contact', 'Contacto', 'text'], ['phone', 'Telefono', 'tel'], ['city', 'Ciudad', 'text']] },
   trucks: { title: 'Camion', prefix: 't', fields: [['plate', 'Patente', 'text'], ['model', 'Modelo', 'text'], ['capacity', 'Capacidad', 'text'], ['status', 'Estado', 'select', ['Disponible', 'En ruta', 'Mantencion']]] },
+  tractorTrailers: { title: 'Tractor/Coloso', prefix: 'tc', fields: [['type', 'Tipo', 'select', ['Tractor', 'Coloso']], ['plate', 'Patente/Codigo', 'text'], ['model', 'Modelo', 'text'], ['capacity', 'Capacidad', 'text'], ['status', 'Estado', 'select', ['Disponible', 'En ruta', 'Mantencion', 'Arrendado']]] },
   drivers: { title: 'Conductor', prefix: 'd', fields: [['name', 'Nombre', 'text'], ['phone', 'Telefono', 'tel'], ['license', 'Licencia', 'text'], ['status', 'Estado', 'select', ['Disponible', 'En ruta', 'Descanso']]] },
   helpers: { title: 'Peoneta', prefix: 'p', fields: [['name', 'Nombre', 'text'], ['phone', 'Telefono', 'tel'], ['status', 'Estado', 'select', ['Disponible', 'En ruta', 'Descanso']]] },
   orders: { title: 'Pedido', prefix: 'o', fields: [['code', 'Codigo', 'text'], ['origin', 'Origen', 'text'], ['date', 'Fecha', 'date'], ['truckId', 'Camion', 'trucks'], ['driverId', 'Conductor', 'drivers'], ['status', 'Estado', 'select', ['Pendiente', 'Programado', 'En ruta', 'Terminado']]] }
@@ -157,12 +164,12 @@ function openEditor(collection, id) {
   const schema = schemas[collection]; const item = id ? byId(collection, id) : {}; editing = { collection, id };
   $('#editorTitle').textContent = id ? 'Editar ' + schema.title : 'Agregar ' + schema.title;
   const fields = schema.fields.map(([key, label, type, options]) => { const value = item[key] || defaultValue(collection, key); if (type === 'select') return fieldSelect(key, label, value, options); if (type === 'trucks') return fieldSelect(key, label, value, state.trucks.map((truck) => [truck.id, truck.plate + ' - ' + truck.model])); if (type === 'drivers') return fieldSelect(key, label, value, state.drivers.map((driver) => [driver.id, driver.name])); return inputField(key, label, type, value); });
-  if (collection === 'orders') { fields.push(stopsEditor(orderStops(item).length ? orderStops(item) : [{ clientId: state.clients[0]?.id || '', destination: '' }])); fields.push(helpersEditor(item.helperIds || [])); fields.push(settlementEditor(item)); }
+  if (collection === 'orders') { fields.push(stopsEditor(orderStops(item).length ? orderStops(item) : [{ clientId: state.clients[0]?.id || '', destination: '' }])); fields.push(helpersEditor(item.helperIds || [])); if (id) fields.push(settlementEditor(item)); }
   $('#editorFields').innerHTML = fields.join(''); $('#editor').showModal();
 }
 function readStops() { return $$('.stop-row').map((row) => ({ clientId: row.querySelector('[name="stopClient"]').value, destination: row.querySelector('[name="stopDestination"]').value.trim() })).filter((stop) => stop.clientId && stop.destination); }
 function readSettlement() { return { finished: $('[name="settlementFinished"]')?.checked || false, driverSettled: $('[name="driverSettled"]')?.checked || false, helpersSettled: $('[name="helpersSettled"]')?.checked || false, returnedAmount: $('#returnedAmount')?.value || '', notes: $('#settlementNotes')?.value.trim() || '' }; }
-async function saveEditor(event) { event.preventDefault(); const formData = new FormData($('#editorForm')); const schema = schemas[editing.collection]; const payload = Object.fromEntries(schema.fields.map(([key]) => [key, formData.get(key)])); if (editing.collection === 'orders') { payload.stops = readStops(); payload.helperIds = $$('[name="helperIds"]:checked').map((input) => input.value); payload.settlement = readSettlement(); } if (editing.collection === 'orders' && payload.stops.length === 0) return; if (editing.id) { const index = state[editing.collection].findIndex((item) => item.id === editing.id); state[editing.collection][index] = { ...state[editing.collection][index], ...payload }; } else { state[editing.collection].push({ id: nextId(editing.collection, schema.prefix), ...payload }); } await saveState(); $('#editor').close(); renderAll(); }
+async function saveEditor(event) { event.preventDefault(); const formData = new FormData($('#editorForm')); const schema = schemas[editing.collection]; const payload = Object.fromEntries(schema.fields.map(([key]) => [key, formData.get(key)])); if (editing.collection === 'orders') { payload.stops = readStops(); payload.helperIds = $$('[name="helperIds"]:checked').map((input) => input.value); payload.settlement = editing.id ? readSettlement() : { finished: false, driverSettled: false, helpersSettled: false, returnedAmount: '', notes: '' }; } if (editing.collection === 'orders' && payload.stops.length === 0) return; if (editing.id) { const index = state[editing.collection].findIndex((item) => item.id === editing.id); state[editing.collection][index] = { ...state[editing.collection][index], ...payload }; } else { state[editing.collection].push({ id: nextId(editing.collection, schema.prefix), ...payload }); } await saveState(); $('#editor').close(); renderAll(); }
 async function deleteItem(collection, id) { state[collection] = state[collection].filter((item) => item.id !== id); await saveState(); renderAll(); }
 
 document.addEventListener('click', (event) => { const tab = event.target.closest('[data-view]'), viewLink = event.target.closest('[data-view-link]'), edit = event.target.closest('[data-edit]'), remove = event.target.closest('[data-delete]'), addStop = event.target.closest('[data-add-stop]'), removeStop = event.target.closest('[data-remove-stop]'); if (tab) setView(tab.dataset.view); if (viewLink) setView(viewLink.dataset.viewLink); if (edit) openEditor(edit.dataset.edit, edit.dataset.id); if (remove) deleteItem(remove.dataset.delete, remove.dataset.id); if (addStop) $('#stopsRows').insertAdjacentHTML('beforeend', stopRow({ clientId: state.clients[0]?.id || '', destination: '' })); if (removeStop) { const rows = $$('.stop-row'); if (rows.length > 1) removeStop.closest('.stop-row').remove(); } });
@@ -170,6 +177,7 @@ $('#newOrder').addEventListener('click', () => openEditor('orders'));
 $('#newOrderTop').addEventListener('click', () => { setView('orders'); openEditor('orders'); });
 $('#newClient').addEventListener('click', () => openEditor('clients'));
 $('#newTruck').addEventListener('click', () => openEditor('trucks'));
+$('#newTractorTrailer').addEventListener('click', () => openEditor('tractorTrailers'));
 $('#newDriver').addEventListener('click', () => openEditor('drivers'));
 $('#newHelper').addEventListener('click', () => openEditor('helpers'));
 $('#editorForm').addEventListener('submit', saveEditor);

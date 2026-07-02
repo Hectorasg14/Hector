@@ -17,6 +17,7 @@
         <button class="tab" data-view="orders">Pedidos</button>
         <button class="tab" data-view="clients">Clientes</button>
         <button class="tab" data-view="trucks">Camiones</button>
+        <button class="tab" data-view="tractorTrailers">Tractores y Colosos</button>
         <button class="tab" data-view="drivers">Conductores</button>
         <button class="tab" data-view="helpers">Peonetas</button>
         <button class="tab" data-view="calendar">Calendario</button>
@@ -32,6 +33,7 @@
           <article class="metric"><span>Pedidos</span><strong id="metricOrders">0</strong></article>
           <article class="metric"><span>Clientes</span><strong id="metricClients">0</strong></article>
           <article class="metric"><span>Camiones activos</span><strong id="metricTrucks">0</strong></article>
+          <article class="metric"><span>Tractores/colosos activos</span><strong id="metricTractorTrailers">0</strong></article>
           <article class="metric"><span>Conductores disponibles</span><strong id="metricDrivers">0</strong></article>
           <article class="metric"><span>Peonetas disponibles</span><strong id="metricHelpers">0</strong></article>
           <article class="metric"><span>Viajes por rendir</span><strong id="metricSettlement">0</strong></article>
@@ -53,6 +55,11 @@
         <div class="section-heading"><div><h2>Camiones</h2><p>Patente, capacidad y disponibilidad de la flota.</p></div><button id="newTruck" class="primary-button">Agregar camion</button></div>
         <div class="table-wrap"><table><thead><tr><th>Patente</th><th>Modelo</th><th>Capacidad</th><th>Estado</th><th></th></tr></thead><tbody id="trucksTable"></tbody></table></div>
       </section>
+      <section id="tractorTrailers" class="view">
+        <div class="section-heading"><div><h2>Tractores y Colosos</h2><p>Equipos de arrastre o apoyo para asignar a viajes.</p></div><button id="newTractorTrailer" class="primary-button">Agregar equipo</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Patente/Codigo</th><th>Modelo</th><th>Capacidad</th><th>Estado</th><th></th></tr></thead><tbody id="tractorTrailersTable"></tbody></table></div>
+      </section>
+
       <section id="drivers" class="view">
         <div class="section-heading"><div><h2>Conductores</h2><p>Disponibilidad y licencias para asignaciones simples.</p></div><button id="newDriver" class="primary-button">Agregar conductor</button></div>
         <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Telefono</th><th>Licencia</th><th>Estado</th><th></th></tr></thead><tbody id="driversTable"></tbody></table></div>
