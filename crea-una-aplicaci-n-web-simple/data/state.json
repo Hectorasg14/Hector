@@ -105,7 +105,13 @@
       "stops": [
         {
           "clientId": "c4-mr18e355",
-          "destination": "Limache"
+          "destination": "Limache",
+          "bottles": "",
+          "drums": "",
+          "collectPayment": false,
+          "collectionAmount": "",
+          "paymentStatus": "No aplica",
+          "notes": ""
         }
       ],
       "helperIds": [
@@ -130,7 +136,13 @@
       "stops": [
         {
           "clientId": "c2-mr187tg8",
-          "destination": "Parral"
+          "destination": "Parral",
+          "bottles": "",
+          "drums": "",
+          "collectPayment": false,
+          "collectionAmount": "",
+          "paymentStatus": "No aplica",
+          "notes": ""
         }
       ],
       "helperIds": [],

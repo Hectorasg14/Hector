@@ -72,8 +72,22 @@ const initialState = {
     }
   ],
   "tractorTrailers": [
-    { "id": "tc1", "type": "Tractor", "plate": "TR-001", "model": "John Deere 5075E", "capacity": "75 HP", "status": "Disponible" },
-    { "id": "tc2", "type": "Coloso", "plate": "CO-014", "model": "Coloso agricola", "capacity": "8 ton", "status": "Arrendado" }
+    {
+      "id": "tc1",
+      "type": "Tractor",
+      "plate": "TR-001",
+      "model": "John Deere 5075E",
+      "capacity": "75 HP",
+      "status": "Disponible"
+    },
+    {
+      "id": "tc2",
+      "type": "Coloso",
+      "plate": "CO-014",
+      "model": "Coloso agricola",
+      "capacity": "8 ton",
+      "status": "Arrendado"
+    }
   ],
   "drivers": [
     {
@@ -87,13 +101,13 @@ const initialState = {
   "helpers": [
     {
       "id": "p1-mr18c5n7",
-      "name": "Camilo",
+      "name": "Camilo Muñoz",
       "phone": "74740570",
       "status": "Disponible"
     },
     {
       "id": "p2-mr18cmpi",
-      "name": "Ricardo",
+      "name": "Ricardo Carter",
       "phone": "+569",
       "status": "Disponible"
     }
@@ -104,13 +118,19 @@ const initialState = {
       "code": "PED-1004",
       "origin": "Melozal",
       "date": "2026-07-01",
-      "truckId": "t1-mr189ebo",
+      "truckId": "t2-mr189nfq",
       "driverId": "d3",
       "status": "Programado",
       "stops": [
         {
           "clientId": "c4-mr18e355",
-          "destination": "Limache"
+          "destination": "Limache",
+          "bottles": "",
+          "drums": "",
+          "collectPayment": false,
+          "collectionAmount": "",
+          "paymentStatus": "No aplica",
+          "notes": ""
         }
       ],
       "helperIds": [
@@ -135,7 +155,13 @@ const initialState = {
       "stops": [
         {
           "clientId": "c2-mr187tg8",
-          "destination": "Parral"
+          "destination": "Parral",
+          "bottles": "",
+          "drums": "",
+          "collectPayment": false,
+          "collectionAmount": "",
+          "paymentStatus": "No aplica",
+          "notes": ""
         }
       ],
       "helperIds": [],
